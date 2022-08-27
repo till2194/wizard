@@ -1,6 +1,7 @@
 import './App.css';
 import NewGame from './App-newGame'
 import React from 'react';
+import Game from './App-game';
 
 class App extends React.Component {
   constructor(props) {
@@ -33,7 +34,7 @@ class App extends React.Component {
         />
         break;
       case "game":
-        main = <dir>Gaming</dir>
+        main = <Game />
         break;
       default:
         main = <dir>Default main (should not happen)</dir>
