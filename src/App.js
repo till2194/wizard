@@ -6,12 +6,15 @@ import Game from './App-game';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.componentDidUpdate = this.componentDidUpdate.bind(this);
+    this.selectInput = this.selectInput.bind(this);
     this.handleAddPlayer = this.handleAddPlayer.bind(this);
     this.handleDeletePlayer = this.handleDeletePlayer.bind(this);
     this.handleChangePlayer = this.handleChangePlayer.bind(this);
     this.handleStartGame = this.handleStartGame.bind(this);
     this.state = {
       state: "newGame",
+      addedPlayer: false,
       players: [{
         name: "Player0",
         points: 0
@@ -51,9 +54,25 @@ class App extends React.Component {
     );
   }
 
+  componentDidUpdate() {
+    if (this.state.addedPlayer) {
+      this.selectInput();
+    }
+  }
+
+  selectInput() {
+    const input = document.getElementById("playerInput"+(this.state.players.length-1));
+    input.focus();
+    input.select();
+    this.setState({
+      addedPlayer: false
+    })
+  }
+
   handleAddPlayer(event) {
     console.log("adding new player...")
     this.setState(prevState => ({
+      addedPlayer: true,
       players: prevState.players.concat({
         name: "Player" + (prevState.players.length),
         points: 0
@@ -61,9 +80,7 @@ class App extends React.Component {
     }))
   }
 
-  handleDeletePlayer(event) {
-    const playerId = parseInt(event.target.id);
-    console.log(this);
+  handleDeletePlayer(event, playerId) {
     this.setState(prevState => {
       console.log("deleting player " + prevState.players[playerId].name + " ...")
       const newPlayers = [...prevState.players.slice(0, playerId), ...prevState.players.slice(playerId+1)];
@@ -73,8 +90,7 @@ class App extends React.Component {
     })
   }
 
-  handleChangePlayer(event) {
-    const playerId = parseInt(event.target.id);
+  handleChangePlayer(event, playerId) {
     this.setState(prevState => {
       let newPlayers = [...prevState.players];
       newPlayers[playerId].name = event.target.value;
