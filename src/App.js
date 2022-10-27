@@ -16,11 +16,10 @@ class App extends React.Component {
       state: "newGame",
       addedPlayer: false,
       players: [{
-        name: "Player0",
-        points: 0
-      },{
-        name: "Player1",
-        points: 0
+        name: "Player0"
+      },
+      {
+        name: "Player1"
       }]
     };
   }
@@ -29,7 +28,8 @@ class App extends React.Component {
     let main;
     switch (this.state.state) {
       case "newGame":
-        main = <NewGame players={this.state.players}
+        main = <NewGame
+          players={this.state.players}
           addHandle={this.handleAddPlayer}
           deleteHandle={this.handleDeletePlayer}
           changeHandle={this.handleChangePlayer}
@@ -37,7 +37,9 @@ class App extends React.Component {
         />
         break;
       case "game":
-        main = <Game />
+        main = <Game
+          state={this.state}
+        />
         break;
       default:
         main = <dir>Default main (should not happen)</dir>
@@ -58,10 +60,11 @@ class App extends React.Component {
     if (this.state.addedPlayer) {
       this.selectInput();
     }
+    console.log(this.state)
   }
 
   selectInput() {
-    const input = document.getElementById("playerInput"+(this.state.players.length-1));
+    const input = document.getElementById("playerInput" + (this.state.players.length - 1));
     input.focus();
     input.select();
     this.setState({
@@ -73,17 +76,14 @@ class App extends React.Component {
     console.log("adding new player...")
     this.setState(prevState => ({
       addedPlayer: true,
-      players: prevState.players.concat({
-        name: "Player" + (prevState.players.length),
-        points: 0
-      })
+      players: prevState.players.concat({name: "Player" + (prevState.players.length)})
     }))
   }
 
   handleDeletePlayer(event, playerId) {
     this.setState(prevState => {
       console.log("deleting player " + prevState.players[playerId].name + " ...")
-      const newPlayers = [...prevState.players.slice(0, playerId), ...prevState.players.slice(playerId+1)];
+      const newPlayers = [...prevState.players.slice(0, playerId), ...prevState.players.slice(playerId + 1)];
       return {
         players: newPlayers
       }
@@ -102,11 +102,46 @@ class App extends React.Component {
 
   handleStartGame(event) {
     console.log("starting game...")
-    this.setState({
-      state: "game"
+    this.setState(prevState => {
+      const roundsMax = this.getRoundsMax(prevState.players.length);
+      return {
+        state: "game",
+        round: 1,
+        roundsMax: roundsMax,
+        rounds: {
+          tricksMax: Array.from({length: roundsMax}, (_, i) => i + 1),
+          tricksSaid: new Array(roundsMax).fill(0),
+          tricksDiff: new Array(roundsMax).fill(0)
+        },
+        players: prevState.players.map(player => {
+          player.tricksSaid = new Array(roundsMax).fill(0);
+          player.tricksGot = new Array(roundsMax).fill(0);
+          player.pointsNew = new Array(roundsMax).fill(0);
+          player.pointsTotal = new Array(roundsMax).fill(0);
+          player.correct = new Array(roundsMax).fill(0);
+          player.correctTotal = new Array(roundsMax).fill(0);
+          return player
+        })
+      }
     })
   }
-  
+
+  getRoundsMax(num) {
+    if (num <= 3) {
+      return 20
+    } else if (num <= 4) {
+      return 15
+    } else if (num <= 5) {
+      return 12
+    } else {
+      return 10
+    }
+  }
+
+  handleSetTrick(event, player, round) {
+
+  }
+
 }
 
 export default App;
